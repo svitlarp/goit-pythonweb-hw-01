@@ -20,28 +20,6 @@ class LibraryInterface(ABC):
     def show_books(self):
         pass
 
-
-# Abstract Library according to Interface Segregation Principle
-class AddBookInterface(ABC):
-    @abstractmethod
-    def add_book(self, book:Book):
-        pass
-
-class RemoveBookInterface(ABC):
-    @abstractmethod
-    def remove_book(self, title: str):
-        pass
-
-class ShowBookInterface(ABC):
-    @abstractmethod
-    def show_books(self):
-        pass 
-
-class ReadBookInterface(ABC):
-    @abstractmethod
-    def read_book(self, title):
-        pass
-
 # Concrete Library. Close for changes, open for extension (Implements a library)
 # Library
 class Library(LibraryInterface):
@@ -61,33 +39,17 @@ class Library(LibraryInterface):
         for book in self.books:
             print(f'Title: {book.title}, Author: {book.author}, Year: {book.year}')
 
-class OnlineLibrary(ShowBookInterface, ReadBookInterface):
-    def __init__(self):
-        self.books = []
-
-    def show_books(self):
-        for book in self.books:
-            print(f'Title: {book.title}, Author: {book.author}, Year: {book.year}')
-
-    def read_book(self, title):
-        for book in self.books:
-            if book.title == title:
-                print(f'Reading the book "{title}"')
 
 # Extension of Library (Extends behavior)
 class LibraryManagement():
-    def __init__(self, library: Library):
+    # Depends on LibraryInterface, not on concrete library
+    def __init__(self, library: LibraryInterface): 
         self.library = library
 
-    def add_book(self):
-        title = input("Enter book title: ").strip()
-        author = input("Enter book author: ").strip()
-        year = input("Enter book year: ").strip()
-        book = Book(title, author, year)
+    def add_book(self, book: Book):
         self.library.add_book(book)
-
-    def remove_book(self):
-        title = input("Enter book title to remove: ").strip()
+        
+    def remove_book(self, title):
         self.library.remove_book(title)
 
     def show_books(self):
@@ -103,9 +65,14 @@ def main():
         
         match command:
             case "add":
-                manager.add_book()
+                title = input("Enter book title: ").strip()
+                author = input("Enter book author: ").strip()
+                year = input("Enter book year: ").strip()
+                book = Book(title, author, year)
+                manager.add_book(book)
             case "remove":
-                manager.remove_book()
+                title = input("Enter book title to remove: ").strip()
+                manager.remove_book(title)
             case "show":
                 manager.show_books()
             case "exit":
